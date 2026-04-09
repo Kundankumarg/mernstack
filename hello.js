@@ -5,7 +5,7 @@ function printchai()
     console.log("chai");
 }
 
-function bringBrush(n)
+function bring(n)
 {
     console.log(`Hanji ley aye ${n} brush`)
 }
@@ -19,5 +19,5 @@ function add(a,b)
 
 
 printchai();
-bringBrush(5);
+bring(5);
 add(3,4);
