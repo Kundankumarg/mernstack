@@ -44,4 +44,7 @@ let studentprofile = {
     favouriteclass :null
 }
 
+// typeof()
 
+
+console.log(typeof(studentprofile))
