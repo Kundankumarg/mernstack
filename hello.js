@@ -19,22 +19,22 @@ function mul(a,b)
 {
     return a*b;
 }
-<<<<<<< HEAD
-=======
+
 
 function sub(a,b)
 {
     return a-b;
 }
->>>>>>> 1fc2e8e (added subtract function)
 
+function modulas(a,b)
+{
+    return a%b;
+}
 
 
 printchai();
 bring(5);
 add(3,4);
-<<<<<<< HEAD
-=======
 console.log(mul(3,2));
->>>>>>> 1fc2e8e (added subtract function)
 console.log(sub(3,2));
+console.log(modulas(3,2));
