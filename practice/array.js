@@ -26,6 +26,10 @@ let m = ["HTML","CSS","java","php"];
 m[1]="javascript";
 console.log(m);
 
+// Adding Elements to the Array
+let p = ["HTML","CSS","java","php"];
+m.push("nodejs"); // The push() method add the element to the end of the array.
+console.log(m);
 
-
-
+m.unshift("Ai"); // The unshift() method add the element to the starting of the array.
+console.log(m);
