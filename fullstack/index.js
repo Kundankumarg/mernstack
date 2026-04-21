@@ -14,7 +14,7 @@ app.use(
   cors({
       origin:process.env.BASE_URL,
       credentials:true,
-      methods: ['GET' , 'POST' , 'DELETE', 'OPTIONS'],
+      methods:['GET' , 'POST' , 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type','Authorization']
 })
 );
@@ -22,7 +22,7 @@ app.use(
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-const port = process.env.port || 4000;
+const port = process.env.PORT || 4000;
 
 app.get('/', (req, res) => {
   res.send('cohort')
