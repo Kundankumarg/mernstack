@@ -98,7 +98,39 @@ const verifyUser = async (req,res) =>{
     // remove verification token
     // save
     // return response 
+    try {
+        const {token} = req.params;
+        console.log(token);
+        if(!token)
+        {
+            return res.status(400).json({
+                message:"Invalid token"
+            })
+        }
+        const user = await User.findOne({verificationToken: token})
 
+        if(!user)
+        {
+            return res.status(400).json({
+                message:"Invalid token"
+            })
+        }
+        user.isVerified = true;
+        user.verificationToken = undefined
+        await user.save();
+
+        return res.status(200).json({
+            message: "Email verified successfully ✔",
+            success: true,
+        });
+
+    } catch (error) 
+    {
+        return res.status(500).json({
+        message: "Server error",
+        error: error.message,
+    }); 
+    }
 }
 
-export {registerUser} // ye export ko routes -> user.routes.js folder may import kare ga
+export {registerUser,verifyUser} // ye export ko routes -> user.routes.js folder may import kare ga
