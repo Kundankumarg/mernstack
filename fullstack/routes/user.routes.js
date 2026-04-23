@@ -1,9 +1,20 @@
-import express from 'express'
-import { registerUser, verifyUser } from '../controller/user.controller.js';
 
-const router = express.Router()
+import express from "express";
+import {
+    registerUser,
+    verifyUser,
+    login
+} from "../controller/user.controller.js";
 
-router.post("/register",registerUser)
-router.get("/verify/:token",verifyUser)
+const router = express.Router();
 
-export default router; // ye export router ko index.js file may import karegay
+// REGISTER
+router.post("/register", registerUser);
+
+// EMAIL VERIFY
+router.get("/verify/:token", verifyUser);
+
+// LOGIN 
+router.post("/login", login);
+
+export default router;

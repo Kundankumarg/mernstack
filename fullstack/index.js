@@ -1,46 +1,36 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors"; // jab frontend and backend diff server ho to cors ka use kartey hai
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import db from "./utils/db.js";
-
-// import all routes
 import userRoutes from "./routes/user.routes.js";
-
 
 dotenv.config();
 
-const app = express()
-app.use(
-  cors({
-      origin:process.env.BASE_URL,
-      credentials:true,
-      methods:['GET' , 'POST' , 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type','Authorization']
-})
-);
+const app = express();
 
-app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+// middleware
+app.use(cors({
+    origin: process.env.BASE_URL,
+    credentials: true,
+}));
 
-const port = process.env.PORT || 4000;
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.get('/', (req, res) => {
-  res.send('cohort')
-})
+// routes
+app.get("/", (req, res) => {
+    res.send("Server is running");
+});
 
+app.use("/api/v1/users", userRoutes);
 
-app.get('/hitesh', (req, res) => {
-  res.send('hitesh')
-})
-
-// connect to db
+// DB connect
 db();
 
-// user routes
-app.use("/api/v1/users",userRoutes)
-
-
-
-app.listen(process.env.port, () => {
-  console.log(`App listening on port ${port}`)
-})
+// server start
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+});
