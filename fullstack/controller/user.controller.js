@@ -166,7 +166,7 @@ const login = async (req,res) =>{
         }
 
         const token = jwt.sign(
-           { id : user._id, role : user.role},
+           { id : user._id, role : user.role}, // ye payload hai
            process.env.JWT_SECRET,
            { expiresIn: '24h'}
         );
@@ -197,6 +197,203 @@ const login = async (req,res) =>{
     }
 }
 
+// Profile
+const getMe = async (req,res) => {    
+    try {
+        const user = await User.findById(req.user.id).select('-password')
+
+        if(!user)
+        {
+            return res.status(400).json({
+                success:false,
+                message:"User not found"
+            });
+        }
+
+        res.status(200).json({
+            success:true,
+            user
+        })
+    }
+    catch (error) {
+
+        return res.status(400).json({
+                success:false,
+                message:"User not found"
+            });
+        
+    }
+}
+
+const LogoutUser = async (req,res) => {
+     
+    try {
+        
+        res.cookie("token", "",{})
+        res.status(200).json({
+            success:true,
+            message:"Logout Successfully"
+        })
+    } 
+    catch (error) {
+
+        return res.status(400).json({
+                success:false,
+                message:"Logout not Successfully"
+            });
+        
+    }
+}
+
+const forgotPassword = async (req,res) => {
+    try {
+        // get email
+        // find user based on email
+        // reset token + reset expiry => Date.now() + 10*60*1000 
+        // user.save
+        // send email => design url
+
+        const {email} = req.body;
+
+        if(!email)
+        {
+           return res.status(400).json({
+            message:"Email is not valid"
+           });
+        }
+
+        const user = await User.findOne({email});
+        if(!user)
+        {
+            return res.status(400).json({
+                message:"user not found"
+            });
+        }
+        console.log(user);
 
 
-export {registerUser,verifyUser,login} // ye export ko routes -> user.routes.js folder may import kare ga
+        // Agar user mil jayga to token generate karegay
+
+        const token = crypto.randomBytes(32).toString("hex");
+        user.resetPasswordToken = token
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minute time rehey ga 
+
+        await user.save()
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.MAILTRAP_HOST,
+            port: Number(process.env.MAILTRAP_PORT),
+            secure: false,
+            auth: {
+                user: process.env.MAILTRAP_USERNAME,
+                pass: process.env.MAILTRAP_PASSWORD,
+            },
+        });
+
+        const mailOption = {
+            from: process.env.MAILTRAP_SENDEREMAIL,
+            to: user.email,
+            subject: "Reset Password",
+            html: `
+                <h2>Reset Password</h2>
+                <p>Click below link:</p>
+                <a href="${process.env.BASE_URL}/api/v1/users/reset/${token}">
+                Reset Password
+                </a>
+            `,
+        };
+
+        await transporter.sendMail(mailOption);
+
+        res.status(200).json({
+            success: true,
+            message: "Reset link sent to email"
+        });
+
+    } catch (error)
+    {
+        res.status(500).json({
+            message: "Error in forgot password",
+            error: error.message
+        });
+    };
+}
+
+const resetPassword = async (req,res) => {
+    try {
+        console.log(req.body);
+        // collect token from params
+        // password from req.body
+
+        const {token} = req.params
+        const {password, confpassword}= req.body
+
+        if(!password || !confpassword)
+        {
+           return res.status(400).json({
+            success:true,
+            message:"All fields are required "
+            });
+        }
+
+
+        if(password !== confpassword)
+        {
+            return res.status(400).json({
+                success: false,
+                message:"Password not match"
+            });
+        }
+        console.log("before",token)
+        const user = await User.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        });
+        console.log("after",token)
+        console.log(user)
+
+
+        if(!user)
+        {
+            return res.status(400).json({
+                message:"Invalid token"
+            })
+        }
+
+        // set new password
+        user.password = password;
+
+        //// clear reset fields
+
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+        
+        res.status(200).json({
+            success: true,
+            message: "Password updated successfully"
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Error resetting password",
+            error: error.message
+        });
+        
+    } 
+};
+
+
+
+export {
+    registerUser,
+    verifyUser,
+    login,
+    getMe,
+    LogoutUser,
+    forgotPassword,
+    resetPassword
+    
+} // ye export ko routes -> user.routes.js folder may import kare ga

@@ -17,11 +17,12 @@ const userSchema = new mongoose.Schema({
     verificationToken:{
         type:String,
     },
-    resetpasswordToken:{
-        type:String,
+    resetPasswordToken: {
+    type: String,
+    
     },
-    resetpasswordExpires:{
-        type:Date,
+    resetPasswordExpires: {
+    type: Date,
     }
 },{
     timestamps:true,
